@@ -1,0 +1,93 @@
+<html>
+  <head>
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
+    <script src="https://www.gstatic.com/firebasejs/ui/live/0.4/firebase-ui-auth.js"></script>
+    <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/live/0.4/firebase-ui-auth.css" />
+
+    <script src="https://www.gstatic.com/firebasejs/3.2.1/firebase.js"></script>
+    <script>
+      // Initialize Firebase
+      var config = {
+        apiKey: "AIzaSyC-634c3ysGA-PZKNyXj3KXwNWEWudOtNQ",
+        authDomain: "design-prototype-with-db.firebaseapp.com",
+        databaseURL: "https://design-prototype-with-db.firebaseio.com",
+        storageBucket: "design-prototype-with-db.appspot.com",
+      };
+      firebase.initializeApp(config);
+    </script>
+    <script type="text/javascript">
+      function getArrayOfElementsBySelector(selector){
+        return [].slice.call(document.querySelectorAll(selector));
+      }
+
+      initApp = function() {
+        firebase.auth().onAuthStateChanged(function(user) {
+          if (!user) {
+            throw new Error("authentication did not return a user");
+          }
+
+          user.getToken().then(function(accessToken) {
+            var myFirebaseRef = new Firebase("https://design-prototype-with-db.firebaseio.com/"); // Replace firebase_URL with your own firebase_URL
+            myFirebaseRef.authWithCustomToken(accessToken);
+
+            var inputElement = document.getElementById("newTask");
+            document.getElementById('addTaskButton').addEventListener('click', function(){
+              var newTaskValue = inputElement.value;
+              var newTask = {
+                task: newTaskValue,
+                status: "incomplete"
+              };
+              addTask(newTask);
+              inputElement.value = "";
+            });
+
+            var addTask = function (task) {
+              myFirebaseRef.child("tasks").push(task);
+            };
+
+            myFirebaseRef.child("tasks").on("value", function(snapshot) {
+              var allTasks = snapshot.val();
+              document.getElementById("tasks").innerHTML = null;
+              
+              Object.keys(allTasks).forEach(function(taskKey){
+                var taskData = allTasks[taskKey];
+              
+                var newDiv = document.createElement("div");
+                newDiv.setAttribute("data-task-key", taskKey);
+                newDiv.innerHTML = taskData.task + ' ' + '<a href="#" class="delete-task"><i class="fa fa-trash"></i></a>';
+                document.getElementById("tasks").appendChild(newDiv);
+              })
+
+              var deleteTaskLinks = getArrayOfElementsBySelector(".delete-task");
+              for (var i=0; i<deleteTaskLinks.length; i++){
+                deleteTaskLinks[i].addEventListener('click', function (){
+                  var key = this.parentElement.getAttribute("data-task-key");
+                  var taskReference = myFirebaseRef.child("tasks").child(key);
+                  taskReference.remove();
+                });  
+              }
+            });
+
+          });
+        });
+      };
+
+      window.addEventListener('load', function() {
+        initApp();
+      });
+    </script>
+  </head>
+    <body>
+      <div id="tasks"></div>
+      <div>
+        <input type="text" placeholder="Add a Task" id="newTask">
+      </div>
+      <button id="addTaskButton">Add Task</button>
+
+      <div id="sign-in-status"></div>
+      <div id="sign-in"></div>
+      <div id="account-details"></div>
+
+      <script src="https://cdn.firebase.com/js/client/2.4.2/firebase.js"></script>
+  </body>
+</html>
