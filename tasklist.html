@@ -8,10 +8,10 @@
     <script>
       // Initialize Firebase
       var config = {
-        apiKey: "AIzaSyC-634c3ysGA-PZKNyXj3KXwNWEWudOtNQ",
-        authDomain: "design-prototype-with-db.firebaseapp.com",
-        databaseURL: "https://design-prototype-with-db.firebaseio.com",
-        storageBucket: "design-prototype-with-db.appspot.com",
+        apiKey: "YOUR KEY HERE",
+        authDomain: "YOUR DOMAIN HERE",
+        databaseURL: "YOUR DB URL HERE",
+        storageBucket: "YOUR STORAGE URL HERE",
       };
       firebase.initializeApp(config);
     </script>
@@ -27,7 +27,7 @@
           }
 
           user.getToken().then(function(accessToken) {
-            var myFirebaseRef = new Firebase("https://design-prototype-with-db.firebaseio.com/"); // Replace firebase_URL with your own firebase_URL
+            var myFirebaseRef = new Firebase("YOUR FIREBASE DB URL");
             myFirebaseRef.authWithCustomToken(accessToken);
 
             var inputElement = document.getElementById("newTask");
